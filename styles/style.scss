@@ -1,0 +1,156 @@
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/Manrope.woff2) format("woff2");
+}
+
+.content-dashboard {
+  font-family: "Manrope";
+  min-height: 90vh !important;
+}
+
+.footer-dashboard {
+  background-color: rgb(218, 218, 218) !important;
+  position: fixed;
+  bottom: 0;
+  max-height: 1vh;
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  background-color: rgb(218, 218, 218) !important;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  .logo-title {
+    max-width: 300px;
+  }
+  .text-title {
+    font-weight: 300;
+    padding: 10px 30px;
+    background-color: #198754;
+    color: white;
+    border-radius: 8px;
+  }
+}
+
+.row-index {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.col-login-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.logo-login {
+  max-width: 100px;
+}
+
+.btn-primary {
+  background-color: #198754 !important;
+  min-width: 100%;
+}
+
+.card-login {
+  padding: 20px 50px !important;
+  border-radius: 12px !important;
+}
+
+.container-cashier {
+  margin-bottom: 80px !important;
+}
+
+.col-title {
+  background-color: rgb(33, 37, 41);
+  min-height: 100px;
+  margin: 50px 0px;
+  padding: 30px 0px;
+  display: flex;
+  align-items: center;
+  .page-title {
+    color: whitesmoke;
+    margin: 0px !important;
+  }
+}
+
+.row-table {
+  min-width: 100%;
+  overflow: auto;
+  .ant-table-wrapper {
+    min-width: min-content;
+  }
+}
+
+.row-cashier {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap-reverse;
+}
+
+.kasir-title {
+  font-weight: bolder;
+}
+
+.alert-form {
+  margin-bottom: 15px;
+  .ant-alert-message {
+    text-align: left;
+  }
+}
+
+.row-btn-table {
+  max-width: 100%;
+  margin: 0px;
+  gap: 4px;
+  .col-btn {
+    padding: 0px !important;
+  }
+  .btn-action {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.info-icon {
+  svg {
+    margin-bottom: 4px;
+    margin-right: 5px;
+  }
+}
+
+.row-total {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.col-float-fight {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.table-jasa {
+  th,
+  td {
+    padding: 10px;
+  }
+}
+
+.btn-tambah {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: flex-end;
+}
