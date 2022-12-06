@@ -1,1 +1,1 @@
-export const api = "https://backend-cashier.herokuapp.com/";
+export const api = "https://backend-cashier-app.vercel.app/";
