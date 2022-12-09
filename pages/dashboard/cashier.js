@@ -598,7 +598,7 @@ export default function Cashier() {
                         <Card.Img
                           variant="top"
                           className="card-image"
-                          src="/images/terigu.webp"
+                          src={barang.image}
                           alt="gambar"
                         />
                         <Card.Body>

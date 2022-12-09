@@ -23,6 +23,7 @@ export default function Login() {
     password: "",
   };
   const [isAlert, setIsAlert] = useState(false);
+  const [message, setMessage] = useState("");
   const [data, setData] = useState(initialState);
 
   const handleInputChange = (event) => {

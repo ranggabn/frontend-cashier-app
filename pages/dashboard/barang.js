@@ -8,6 +8,8 @@ import { numberWithCommasString } from "../../components/utils/koma";
 import { Col, Container, Row } from "react-bootstrap";
 import { authPage } from "../../middleware/authorizationPage";
 import { SearchOutlined, ExclamationCircleFilled } from "@ant-design/icons";
+import Router from "next/router";
+import swal from "sweetalert";
 
 const { confirm } = Modal;
 
@@ -23,10 +25,14 @@ export default function Barang() {
   const searchInput = useRef(null);
 
   useEffect(() => {
+    getBarang();
+  }, []);
+
+  const getBarang = () => {
     axios.get(api + "getAllBarang").then((res) => {
       setData(res.data.data);
     });
-  }, []);
+  };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -130,7 +136,6 @@ export default function Barang() {
   });
 
   const showConfirm = (record) => {
-    console.log(record);
     confirm({
       title: "Yakin ingin menghapus barang?",
       icon: <ExclamationCircleFilled />,
@@ -148,7 +153,9 @@ export default function Barang() {
   const handleDelete = (record) => {
     axios
       .delete(api + "deleteBarang", {
-        key: record.key,
+        params: {
+          key: record.key,
+        },
       })
       .then((res) => {
         swal({
@@ -158,7 +165,16 @@ export default function Barang() {
           button: false,
           timer: 1200,
         });
+        getBarang();
       });
+  };
+
+  const handleClick = (path) => {
+    Router.push(path);
+  };
+
+  const editBarang = (record) => {
+    Router.push("/dashboard/barang/edit/" + record.key);
   };
 
   const columns = [
@@ -221,7 +237,9 @@ export default function Barang() {
         <>
           <Row className="row-btn-table">
             <Col lg={5} md={12} className="col-btn">
-              <Button className="btn-action">Edit</Button>
+              <Button className="btn-action" onClick={() => editBarang(record)}>
+                Edit
+              </Button>
             </Col>
             <Col lg={6} md={12} className="col-btn">
               <Button
@@ -238,6 +256,7 @@ export default function Barang() {
       ),
     },
   ];
+
   return (
     <>
       <Row>
@@ -261,8 +280,18 @@ export default function Barang() {
       <Container style={{ marginBottom: "80px" }}>
         <Row>
           <Col lg={12} sm={12} className="btn-tambah">
-            <Button size="large">Tambah Barang</Button>
-            <Button type="primary" size="large" style={{ marginLeft: "10px" }}>
+            <Button
+              size="large"
+              onClick={() => handleClick("/dashboard/barang/new")}
+            >
+              Tambah Barang
+            </Button>
+            <Button
+              type="primary"
+              size="large"
+              style={{ marginLeft: "10px" }}
+              onClick={() => handleClick("/dashboard/supplier")}
+            >
               Beli Ke Supplier
             </Button>
           </Col>
