@@ -12,8 +12,7 @@
 
 .footer-dashboard {
   background-color: rgb(218, 218, 218) !important;
-  position: fixed;
-  bottom: 0;
+  position: relative;
   max-height: 1vh;
   min-width: 100%;
   display: flex;
@@ -135,6 +134,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.card-image {
+  height: 230px;
 }
 
 .col-float-fight {
