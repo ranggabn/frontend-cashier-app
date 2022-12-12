@@ -1,1 +1,1 @@
-export const api = "https://backend-cashier-lmfhmi51v-ranggabn.vercel.app/";
+export const api = "https://backend-cashier-app.vercel.app/";
