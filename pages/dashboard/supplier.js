@@ -234,8 +234,8 @@ export default function Supplier() {
             setSupplier("");
           })
         );
-        handlePrint();
       });
+    await handlePrint();
   };
 
   const handlePrint = useReactToPrint({

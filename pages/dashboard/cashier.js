@@ -425,8 +425,8 @@ export default function Cashier() {
             deleteAllKeranjang(false);
           })
         );
-        handlePrint();
       });
+    await handlePrint();
   };
 
   const onChange = (value, data) => {
