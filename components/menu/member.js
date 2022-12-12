@@ -35,6 +35,9 @@ export default function Member({ handleClick }) {
         <Nav.Link onClick={() => handleClick("/dashboard/laporanPenggilingan")}>
           Laporan Jasa Penggilingan
         </Nav.Link>
+        <Nav.Link onClick={() => handleClick("/dashboard/laporanKeuangan")}>
+          Laporan Keuangan
+        </Nav.Link>
       </Nav>
       <Form className="d-flex">
         <Button variant="outline-success" onClick={() => logout()}>
