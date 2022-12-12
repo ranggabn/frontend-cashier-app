@@ -62,6 +62,7 @@ export default function Cashier() {
     getBarang("");
     getKeranjang();
     getJasa();
+    getPelanggan();
   }, []);
 
   const getKategori = () => {
@@ -255,17 +256,21 @@ export default function Cashier() {
   const jenisPelanggan = (e) => {
     setPelanggan(e);
     if (e == "2") {
-      axios.get(api + "getPelanggan").then((res) => {
-        const result = Object.values(res.data.data);
-        result.map(
-          (data) => (
-            (data["label"] = data["nama_pelanggan"]),
-            (data["value"] = data["nama_pelanggan"])
-          )
-        );
-        setOption(result);
-      });
+      getPelanggan();
     }
+  };
+
+  const getPelanggan = () => {
+    axios.get(api + "getPelanggan").then((res) => {
+      const result = Object.values(res.data.data);
+      result.map(
+        (data) => (
+          (data["label"] = data["nama_pelanggan"]),
+          (data["value"] = data["nama_pelanggan"])
+        )
+      );
+      setOption(result);
+    });
   };
 
   const showModal = (id_barang, type) => {
