@@ -26,6 +26,7 @@
     "react-bootstrap-sweetalert": "^5.2.0",
     "react-dom": "18.2.0",
     "react-highlight-words": "^0.18.0",
+    "react-to-print": "^2.14.10",
     "sass": "^1.56.1",
     "sweetalert": "^2.1.2"
   }
