@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Row,
   Col,
@@ -26,6 +26,7 @@ import { api } from "../../components/utils/api";
 import { authPage } from "../../middleware/authorizationPage";
 import ModalKeranjang from "../../components/modal/modalKeranjang";
 import ModalKeranjangJasa from "../../components/modal/modalKeranjangJasa";
+import { useReactToPrint } from "react-to-print";
 
 const { confirm } = Modal;
 const { Option } = Select;
@@ -35,8 +36,8 @@ export async function getServerSideProps(ctx) {
 
   return { props: { token } };
 }
-
 export default function Cashier() {
+  const componentRef = useRef();
   const [kategori, setKategori] = useState([]);
   const [barang, setBarang] = useState([]);
   const [jasa, setJasa] = useState([]);
@@ -52,6 +53,7 @@ export default function Cashier() {
   const [pelanggan, setPelanggan] = useState("");
   const [option, setOption] = useState([]);
   const [searchTerm, setsearchTerm] = useState("");
+  const [struk, setStruk] = useState("");
   const [currentPagination, setCurrentPagination] = useState(1);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -62,6 +64,7 @@ export default function Cashier() {
     getBarang("");
     getKeranjang();
     getJasa();
+    getPelanggan();
   }, []);
 
   const getKategori = () => {
@@ -255,17 +258,21 @@ export default function Cashier() {
   const jenisPelanggan = (e) => {
     setPelanggan(e);
     if (e == "2") {
-      axios.get(api + "getPelanggan").then((res) => {
-        const result = Object.values(res.data.data);
-        result.map(
-          (data) => (
-            (data["label"] = data["nama_pelanggan"]),
-            (data["value"] = data["nama_pelanggan"])
-          )
-        );
-        setOption(result);
-      });
+      getPelanggan();
     }
+  };
+
+  const getPelanggan = () => {
+    axios.get(api + "getPelanggan").then((res) => {
+      const result = Object.values(res.data.data);
+      result.map(
+        (data) => (
+          (data["label"] = data["nama_pelanggan"]),
+          (data["value"] = data["nama_pelanggan"])
+        )
+      );
+      setOption(result);
+    });
   };
 
   const showModal = (id_barang, type) => {
@@ -376,45 +383,50 @@ export default function Cashier() {
       });
   };
 
-  const postPenjualan = () => {
+  const postPenjualan = async () => {
     const requestBody = {
       nomor_struk: "SP-" + new Date().getTime(),
       nama_pelanggan: dataPelanggan.nama,
       nomor_telefon: dataPelanggan.nomor_telefon,
       total_harga: total,
     };
+    setStruk(requestBody.nomor_struk);
 
-    axios.post(api + "postPenjualan", qs.stringify(requestBody)).then((res) => {
-      if (keranjangJasa.length > 0) {
-        keranjangJasa[0]["nomor_struk"] = requestBody.nomor_struk;
-      }
-      axios
-        .post(api + "postDetailJasa", qs.stringify(keranjangJasa[0]))
-        .then((res) => {
-          swal({
-            title: "BERHASIL!",
-            text: res.data.message,
-            icon: "success",
-            button: false,
-            timer: 1200,
+    await axios
+      .post(api + "postPenjualan", qs.stringify(requestBody))
+      .then((res) => {
+        if (keranjangJasa.length > 0) {
+          keranjangJasa[0]["nomor_struk"] = requestBody.nomor_struk;
+        }
+        axios
+          .post(api + "postDetailJasa", qs.stringify(keranjangJasa[0]))
+          .then((res) => {
+            swal({
+              title: "BERHASIL!",
+              text: res.data.message,
+              icon: "success",
+              button: false,
+              timer: 1200,
+            });
+            deleteAllKeranjang(false);
           });
-          deleteAllKeranjang(false);
-        });
-      keranjang.map((data) => (data["nomor_struk"] = requestBody.nomor_struk));
-      keranjang.map((data) =>
-        axios.post(api + "postDetailPenjualan", data).then((res) => {
-          swal({
-            title: "BERHASIL!",
-            text: res.data.message,
-            icon: "success",
-            button: false,
-            timer: 1200,
-          });
-
-          deleteAllKeranjang(false);
-        })
-      );
-    });
+        keranjang.map(
+          (data) => (data["nomor_struk"] = requestBody.nomor_struk)
+        );
+        keranjang.map((data) =>
+          axios.post(api + "postDetailPenjualan", data).then((res) => {
+            swal({
+              title: "BERHASIL!",
+              text: res.data.message,
+              icon: "success",
+              button: false,
+              timer: 1200,
+            });
+            deleteAllKeranjang(false);
+          })
+        );
+      });
+    await handlePrint();
   };
 
   const onChange = (value, data) => {
@@ -430,6 +442,7 @@ export default function Cashier() {
         },
       })
       .then((res) => {
+        console.log(res.data.data);
         setKeranjang(res.data.data);
         const result = Object.values(res.data.data);
         result.map((data) =>
@@ -492,6 +505,10 @@ export default function Cashier() {
       });
     }
   };
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
 
   return (
     <div className="container-cashier">
@@ -647,6 +664,110 @@ export default function Cashier() {
                 <strong>Keranjang</strong>
               </h4>
               <hr />
+              <div style={{ position: "absolute", zIndex: "-1" }}>
+                <div ref={componentRef} style={{ padding: "40px" }}>
+                  <h4 className="text-center">Struk Penjualan Barang</h4>
+                  <h5 className="text-center">Sumber Rezeki Makmur</h5>
+                  <hr />
+                  <p>
+                    Nomor Struk : <b>{struk}</b>
+                  </p>
+                  <p>
+                    Nama Pelanggan : <b>{dataPelanggan.nama}</b>
+                  </p>
+                  <p>
+                    Nomor Telefon : <b>{dataPelanggan.nomor_telefon}</b>
+                  </p>
+                  <hr />
+                  <ListGroup>
+                    {keranjang.map((keranjang) => (
+                      <ListGroup.Item key={keranjang.key} type="button" action>
+                        <Row>
+                          <Col xl={1} lg={1} md={1} xs={1}>
+                            <Badge pill bg="success">
+                              {keranjang.jumlah_barang}
+                            </Badge>
+                          </Col>
+                          <Col xl={7} lg={5} md={6} xs={7}>
+                            <h5>{keranjang.nama}</h5>
+                            <p>Rp. {numberWithCommasString(keranjang.harga)}</p>
+                          </Col>
+                          <Col xl={4} lg={5} md={4} xs={4}>
+                            <b>
+                              <p style={{ fontWeight: "bolder" }}>
+                                Rp.{" "}
+                                {numberWithCommasString(
+                                  keranjang.jumlah_barang * keranjang.harga
+                                )}
+                              </p>
+                            </b>
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+                    ))}
+                    {keranjangJasa.map((jasa) => (
+                      <ListGroup.Item
+                        key={jasa.key}
+                        type="button"
+                        onClick={() => showModal(jasa.id_jasa, "jasa")}
+                        action
+                      >
+                        <Row>
+                          <Col xl={1} lg={1} md={1} xs={1}>
+                            <Badge pill bg="success">
+                              {jasa.jumlah}
+                            </Badge>
+                          </Col>
+                          <Col xl={7} lg={5} md={6} xs={7}>
+                            <h5>{jasa.nama_jasa}</h5>
+                            <p>Rp. {numberWithCommasString(jasa.harga_jasa)}</p>
+                          </Col>
+                          <Col xl={4} lg={5} md={4} xs={4}>
+                            <b>
+                              <p style={{ fontWeight: "bolder" }}>
+                                Rp.{" "}
+                                {numberWithCommasString(
+                                  jasa.jumlah * jasa.harga_jasa
+                                )}
+                              </p>
+                            </b>
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+                    ))}
+                    <br />
+                  </ListGroup>
+                  <hr />
+                  <Row className="row-total">
+                    <Col
+                      xl={3}
+                      lg={3}
+                      md={4}
+                      sm={2}
+                      xs={3}
+                      style={{ paddingRight: "0px" }}
+                    >
+                      <h5 style={{ marginBottom: "5px" }}>Total : </h5>
+                    </Col>
+                    <Col xl={9} lg={9} md={8} sm={10} xs={9}>
+                      <ListGroup>
+                        <ListGroup.Item variant="success">
+                          <h5
+                            style={{
+                              whiteSpace: "nowrap",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            {total
+                              ? "Rp. " + numberWithCommasString(total)
+                              : ""}
+                          </h5>
+                        </ListGroup.Item>
+                      </ListGroup>
+                    </Col>
+                  </Row>
+                </div>
+              </div>
               <Select
                 style={{
                   width: "100%",

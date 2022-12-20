@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Row,
   Col,
@@ -24,8 +24,7 @@ import LayoutPage from "../../components/layoutPage";
 import { api } from "../../components/utils/api";
 import { authPage } from "../../middleware/authorizationPage";
 import ModalKeranjangBeli from "../../components/modal/modalKeranjangBeli";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import { useReactToPrint } from "react-to-print";
 
 const { confirm } = Modal;
 
@@ -36,6 +35,7 @@ export async function getServerSideProps(ctx) {
 }
 
 export default function Supplier() {
+  const componentRef = useRef();
   const [kategori, setKategori] = useState([]);
   const [barang, setBarang] = useState([]);
   const [keranjang, setKeranjang] = useState([]);
@@ -207,7 +207,7 @@ export default function Supplier() {
       });
   };
 
-  const postPembelian = (e) => {
+  const postPembelian = async (e) => {
     const requestBody = {
       nomor_struk: "SP-" + new Date().getTime(),
       total_harga: total,
@@ -215,35 +215,32 @@ export default function Supplier() {
     };
     setStruk(requestBody.nomor_struk);
 
-    axios.post(api + "postPembelian", qs.stringify(requestBody)).then((res) => {
-      keranjang.map((data) => (data["nomor_struk"] = requestBody.nomor_struk));
-      keranjang.map((data) =>
-        axios.post(api + "postDetailPembelian", data).then((res) => {
-          swal({
-            title: "BERHASIL!",
-            text: res.data.message,
-            icon: "success",
-            button: false,
-            timer: 1200,
-          });
-          deleteAllKeranjang(false);
-          setSupplier("");
-        })
-      );
-      printDocument(requestBody.nomor_struk);
-    });
+    await axios
+      .post(api + "postPembelian", qs.stringify(requestBody))
+      .then((res) => {
+        keranjang.map(
+          (data) => (data["nomor_struk"] = requestBody.nomor_struk)
+        );
+        keranjang.map((data) =>
+          axios.post(api + "postDetailPembelian", data).then((res) => {
+            swal({
+              title: "BERHASIL!",
+              text: res.data.message,
+              icon: "success",
+              button: false,
+              timer: 1200,
+            });
+            deleteAllKeranjang(false);
+            setSupplier("");
+          })
+        );
+      });
+    await handlePrint();
   };
 
-  const printDocument = (filename) => {
-    const input = document.getElementById("divToPrint");
-    html2canvas(input).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, "JPEG", 0, 0);
-      // pdf.output('dataurlnewwindow');
-      pdf.save(filename + ".pdf");
-    });
-  };
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
 
   const deleteKeranjang = (id_barang) => {
     const data = {
@@ -388,8 +385,9 @@ export default function Supplier() {
               </h4>
               <hr />
               <div style={{ position: "absolute", zIndex: "-1" }}>
-                <div id="divToPrint" style={{ padding: "40px" }}>
-                  <h4>Struk Pembelian Ke Supplier</h4>
+                <div ref={componentRef} style={{ padding: "40px" }}>
+                  <h4 className="text-center">Struk Pembelian Ke Supplier</h4>
+                  <h5 className="text-center">Sumber Rezeki Makmur</h5>
                   <hr />
                   <p>
                     Nomor Struk : <b>{struk}</b>
