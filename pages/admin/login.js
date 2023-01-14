@@ -48,16 +48,17 @@ export default function Login() {
     };
 
     await axios
-      .post(api + "auth/api/v1/login", qs.stringify(requestBody), config)
+      .post(api + "auth/api/v1/loginAdmin", qs.stringify(requestBody), config)
       .then((res) => {
         if (res.data.status === "99") {
           setMessage(res.data.message);
           setIsAlert(true);
         } else {
           Cookie.set("username", res.data.data.username);
+          Cookie.set("role", res.data.data.role);
           Cookie.set("token", res.data.token);
           setTimeout(() => {
-            Router.push("/dashboard/cashier");
+            Router.push("/dashboard/barang");
           }, 50);
         }
       });
@@ -71,11 +72,7 @@ export default function Login() {
               <Card className="card-login">
                 <Row style={{ marginBottom: "30px !important" }}>
                   <Col className="row-index">
-                    <img
-                      src="/images/password.png"
-                      alt="logo"
-                      className="logo-login"
-                    />
+                    <h3>LOGIN ADMIN</h3>
                   </Col>
                 </Row>
                 <Row>

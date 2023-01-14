@@ -136,11 +136,33 @@ export default function LaporanPenggilingan() {
       ...getColumnSearchProps("nomor_struk"),
     },
     {
+      title: "Nama Jasa",
+      dataIndex: "nama_jasa",
+      key: "nama_jasa",
+      width: "10%",
+      ...getColumnSearchProps("nama_jasa"),
+    },
+    {
       title: "Jumlah KG",
-      dataIndex: "jumlah",
       key: "jumlah",
       width: "10%",
-      ...getColumnSearchProps("jumlah"),
+      render: (data) => (
+        <>
+          <p style={{ marginBottom: "0px" }}>{data.jumlah} kg</p>
+        </>
+      ),
+    },
+    {
+      title: "Waktu",
+      key: "waktu",
+      width: "10%",
+      render: (data) => (
+        <>
+          <p style={{ marginBottom: "0px" }}>
+            {data.jumlah * data.waktu} menit
+          </p>
+        </>
+      ),
     },
     {
       title: "Total Harga",

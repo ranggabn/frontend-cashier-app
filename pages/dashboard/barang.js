@@ -154,7 +154,7 @@ export default function Barang() {
     axios
       .delete(api + "deleteBarang", {
         params: {
-          key: record.key,
+          id_barang: record.id_barang,
         },
       })
       .then((res) => {
@@ -174,7 +174,7 @@ export default function Barang() {
   };
 
   const editBarang = (record) => {
-    Router.push("/dashboard/barang/edit/" + record.key);
+    Router.push("/dashboard/barang/edit/" + record.id_barang);
   };
 
   const columns = [

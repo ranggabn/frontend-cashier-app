@@ -11,14 +11,6 @@ export default function User({ handleClick }) {
       >
         <Nav.Link onClick={() => handleClick("/")}>Home</Nav.Link>
       </Nav>
-      <Form className="d-flex">
-        <Button
-          variant="outline-success"
-          onClick={() => handleClick("/auth/login")}
-        >
-          Login
-        </Button>
-      </Form>
     </>
   );
 }

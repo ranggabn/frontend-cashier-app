@@ -83,7 +83,7 @@ export default function Cashier() {
     axios
       .get(api + "getBarang", {
         params: {
-          kategori: kategori,
+          id_kategori: kategori,
         },
       })
       .then((res) => {
@@ -116,18 +116,9 @@ export default function Cashier() {
         keranjang.map((data) =>
           axios.put(api + "returnBarang", data).then((res) => {
             getBarang("");
-            swal({
-              title: "Sukses Bersihkan Keranjang",
-              text: "Keranjang telah kosong!",
-              icon: "success",
-              button: false,
-              timer: 1200,
-            });
           })
         );
       }
-    });
-    await axios.delete(api + "deleteKeranjangJasa").then((res) => {
       swal({
         title: "Sukses Bersihkan Keranjang",
         text: "Keranjang telah kosong!",
@@ -140,8 +131,8 @@ export default function Cashier() {
     setPelanggan("");
   };
 
-  const handleChangeKateg = (key) => {
-    getBarang(key);
+  const handleChangeKateg = (id_kategori) => {
+    getBarang(id_kategori);
   };
 
   const postKeranjang = (id_barang) => {
@@ -491,18 +482,24 @@ export default function Cashier() {
           getKeranjang();
         });
     } else {
-      axios.delete(api + "deleteKeranjangJasa").then((res) => {
-        setOpenJasa(false);
-        swal({
-          title: "Sukses Bersihkan Keranjang",
-          text: "Keranjang telah kosong!",
-          icon: "success",
-          button: false,
-          timer: 1200,
+      axios
+        .delete(api + "deleteKeranjangJasa", {
+          params: {
+            id_jasa: id_barang,
+          },
+        })
+        .then((res) => {
+          setOpenJasa(false);
+          swal({
+            title: "Sukses Bersihkan Keranjang",
+            text: "Keranjang telah kosong!",
+            icon: "success",
+            button: false,
+            timer: 1200,
+          });
+          getKeranjang();
+          getBarang("");
         });
-        getKeranjang();
-        getBarang("");
-      });
     }
   };
 
@@ -542,8 +539,8 @@ export default function Cashier() {
               <ListGroup.Item
                 tag="button"
                 action
-                key={kateg.key}
-                onClick={() => handleChangeKateg(kateg.key)}
+                key={kateg.id_kategori}
+                onClick={() => handleChangeKateg(kateg.id_kategori)}
               >
                 {kateg.nama}
               </ListGroup.Item>
@@ -574,20 +571,24 @@ export default function Cashier() {
                   <tr>
                     <th>#</th>
                     <th>Nama Jasa</th>
+                    <th>Mesin</th>
+                    <th>Waktu</th>
                     <th>Harga</th>
                     <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {jasa.map((jasa) => (
-                    <tr key={jasa.key}>
-                      <td>1</td>
+                  {jasa.map((jasa, index) => (
+                    <tr key={jasa.id_jasa}>
+                      <td>{index + 1}</td>
                       <td>{jasa.nama_jasa}</td>
+                      <td>{jasa.nama_mesin}</td>
+                      <td>{jasa.waktu} menit</td>
                       <td>
                         Rp. {numberWithCommasString(jasa.harga_jasa)} / Kg
                       </td>
                       <td>
-                        <Button onClick={() => postKeranjangJasa(jasa.key)}>
+                        <Button onClick={() => postKeranjangJasa(jasa.id_jasa)}>
                           Tambah Keranjang
                         </Button>
                       </td>
@@ -610,7 +611,7 @@ export default function Cashier() {
                   })
                   .slice((currentPagination - 1) * 10, 10 * currentPagination)
                   .map((barang, key) => (
-                    <Col md={4} xs={6} className="mb-4" key={barang.key}>
+                    <Col md={4} xs={6} className="mb-4" key={barang.id_barang}>
                       <Card className="shadow card-body-toko">
                         <Card.Img
                           variant="top"
@@ -636,7 +637,7 @@ export default function Cashier() {
                             color="info"
                             className="mb-1 mt-2"
                             type="button"
-                            onClick={() => postKeranjang(barang.key)}
+                            onClick={() => postKeranjang(barang.id_barang)}
                             disabled={barang.stok ? false : true}
                           >
                             {barang.stok ? "Tambah Keranjang" : "Stok Habis"}
@@ -681,7 +682,11 @@ export default function Cashier() {
                   <hr />
                   <ListGroup>
                     {keranjang.map((keranjang) => (
-                      <ListGroup.Item key={keranjang.key} type="button" action>
+                      <ListGroup.Item
+                        key={keranjang.id_keranjang}
+                        type="button"
+                        action
+                      >
                         <Row>
                           <Col xl={1} lg={1} md={1} xs={1}>
                             <Badge pill bg="success">
@@ -707,7 +712,7 @@ export default function Cashier() {
                     ))}
                     {keranjangJasa.map((jasa) => (
                       <ListGroup.Item
-                        key={jasa.key}
+                        key={jasa.id_keranjang_jasa}
                         type="button"
                         onClick={() => showModal(jasa.id_jasa, "jasa")}
                         action
@@ -826,7 +831,7 @@ export default function Cashier() {
               <ListGroup>
                 {keranjang.map((keranjang) => (
                   <ListGroup.Item
-                    key={keranjang.key}
+                    key={keranjang.id_keranjang}
                     type="button"
                     onClick={() => showModal(keranjang.id_barang, "barang")}
                     action
@@ -856,7 +861,7 @@ export default function Cashier() {
                 ))}
                 {keranjangJasa.map((jasa) => (
                   <ListGroup.Item
-                    key={jasa.key}
+                    key={jasa.id_keranjang_jasa}
                     type="button"
                     onClick={() => showModal(jasa.id_jasa, "jasa")}
                     action

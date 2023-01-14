@@ -26,7 +26,7 @@ export async function getServerSideProps(ctx) {
 export default function EditBarang() {
   const [form] = Form.useForm();
   const router = useRouter();
-  const { key } = router.query;
+  const { id_barang } = router.query;
   const [data, setData] = useState({
     nama: "",
     harga: "",
@@ -54,7 +54,7 @@ export default function EditBarang() {
     await axios
       .get(api + "getBarangById", {
         params: {
-          key: key,
+          id_barang: id_barang,
         },
       })
       .then((res) => {
@@ -90,7 +90,7 @@ export default function EditBarang() {
 
   const handleSubmit = () => {
     const bodyRequest = {
-      key: key,
+      id_barang: id_barang,
       nama: data.nama,
       harga: data.harga,
       harga_supplier: data.harga_supplier,
@@ -262,7 +262,10 @@ export default function EditBarang() {
                     Pilih Kategori
                   </Option>
                   {kategori.map((kategori) => (
-                    <Option value={kategori.key} key={kategori.key}>
+                    <Option
+                      value={kategori.id_kategori}
+                      key={kategori.id_kategori}
+                    >
                       {kategori.nama}
                     </Option>
                   ))}

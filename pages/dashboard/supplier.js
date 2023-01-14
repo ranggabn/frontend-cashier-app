@@ -64,7 +64,7 @@ export default function Supplier() {
     axios
       .get(api + "getBarang", {
         params: {
-          kategori: kategori,
+          id_kategori: kategori,
         },
       })
       .then((res) => {
@@ -100,8 +100,8 @@ export default function Supplier() {
     });
   };
 
-  const handleChangeKateg = (key) => {
-    getBarang(key);
+  const handleChangeKateg = (id_kategori) => {
+    getBarang(id_kategori);
   };
 
   const postKeranjang = (id_barang) => {
@@ -299,8 +299,8 @@ export default function Supplier() {
               <ListGroup.Item
                 tag="button"
                 action
-                key={kateg.key}
-                onClick={() => handleChangeKateg(kateg.key)}
+                key={kateg.id_kategori}
+                onClick={() => handleChangeKateg(kateg.id_kategori)}
               >
                 {kateg.nama}
               </ListGroup.Item>
@@ -350,7 +350,7 @@ export default function Supplier() {
                     })
                     .slice((currentPagination - 1) * 10, 10 * currentPagination)
                     .map((barang, key) => (
-                      <tr key={barang.key}>
+                      <tr key={barang.id_barang}>
                         <td>{barang.nama}</td>
                         <td>
                           Rp. {numberWithCommasString(barang.harga_supplier)} /{" "}
@@ -358,7 +358,9 @@ export default function Supplier() {
                         </td>
                         <td>{barang.stok}</td>
                         <td>
-                          <Button onClick={() => postKeranjang(barang.key)}>
+                          <Button
+                            onClick={() => postKeranjang(barang.id_barang)}
+                          >
                             Tambah Keranjang
                           </Button>
                         </td>
@@ -399,7 +401,7 @@ export default function Supplier() {
                   <ListGroup>
                     {keranjang.map((keranjang) => (
                       <ListGroup.Item
-                        key={keranjang.key}
+                        key={keranjang.id_keranjang}
                         type="button"
                         onClick={() => showModal(keranjang.id_barang)}
                         action
@@ -475,7 +477,7 @@ export default function Supplier() {
               <ListGroup>
                 {keranjang.map((keranjang) => (
                   <ListGroup.Item
-                    key={keranjang.key}
+                    key={keranjang.id_keranjang}
                     type="button"
                     onClick={() => showModal(keranjang.id_barang)}
                     action

@@ -227,7 +227,10 @@ export default function New() {
                     Pilih Kategori
                   </Option>
                   {kategori.map((kategori) => (
-                    <Option value={kategori.key} key={kategori.key}>
+                    <Option
+                      value={kategori.id_kategori}
+                      key={kategori.id_kategori}
+                    >
                       {kategori.nama}
                     </Option>
                   ))}

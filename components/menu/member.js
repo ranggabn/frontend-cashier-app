@@ -7,6 +7,7 @@ export default function Member({ handleClick }) {
   const logout = () => {
     Cookie.remove("username");
     Cookie.remove("token");
+    Cookie.remove("role");
 
     setTimeout(() => {
       Router.push("/");
@@ -22,9 +23,6 @@ export default function Member({ handleClick }) {
       >
         <Nav.Link onClick={() => handleClick("/dashboard/cashier")}>
           Kasir
-        </Nav.Link>
-        <Nav.Link onClick={() => handleClick("/dashboard/barang")}>
-          Barang
         </Nav.Link>
         <Nav.Link onClick={() => handleClick("/dashboard/laporanPenjualan")}>
           Laporan Penjualan
