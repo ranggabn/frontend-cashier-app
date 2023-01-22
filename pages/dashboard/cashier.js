@@ -51,7 +51,9 @@ export default function Cashier() {
     nomor_telefon: "",
   });
   const [pelanggan, setPelanggan] = useState("");
+  const [cari, setCari] = useState("");
   const [option, setOption] = useState([]);
+  const [noOption, setNoOption] = useState([]);
   const [searchTerm, setsearchTerm] = useState("");
   const [struk, setStruk] = useState("");
   const [currentPagination, setCurrentPagination] = useState(1);
@@ -250,6 +252,7 @@ export default function Cashier() {
     setPelanggan(e);
     if (e == "2") {
       getPelanggan();
+      getNomorPelanggan();
     }
   };
 
@@ -263,6 +266,19 @@ export default function Cashier() {
         )
       );
       setOption(result);
+    });
+  };
+
+  const getNomorPelanggan = () => {
+    axios.get(api + "getPelanggan").then((res) => {
+      const result = Object.values(res.data.data);
+      result.map(
+        (data) => (
+          (data["label"] = data["nomor_telefon"]),
+          (data["value"] = data["nomor_telefon"])
+        )
+      );
+      setNoOption(result);
     });
   };
 
@@ -301,12 +317,9 @@ export default function Cashier() {
     const newData = { ...detail };
     newData[e.target.name] = e.target.value;
     let result = keranjang.find((obj) => {
-      return obj.key === newData.id_barang;
+      return obj.id_barang === newData.id_barang;
     });
     if (newData.jumlah_barang !== undefined) {
-      if (newData.jumlah_barang < 1) {
-        newData.jumlah_barang = 1;
-      }
       if (newData.jumlah_barang > detail.stok + result.jumlah_barang) {
         newData.jumlah_barang = detail.stok + result.jumlah_barang;
       }
@@ -417,7 +430,7 @@ export default function Cashier() {
           })
         );
       });
-    await handlePrint();
+    handlePrint();
   };
 
   const onChange = (value, data) => {
@@ -433,7 +446,6 @@ export default function Cashier() {
         },
       })
       .then((res) => {
-        console.log(res.data.data);
         setKeranjang(res.data.data);
         const result = Object.values(res.data.data);
         result.map((data) =>
@@ -513,7 +525,7 @@ export default function Cashier() {
         <Row className="mt-5">
           <Col>
             <h3 className="text-center">
-              <b className="kasir-title">KASIR</b>
+              <b className="kasir-title">PENJUALAN</b>
             </h3>
             <h5 className="text-center">Sumber Rezeki Makmur</h5>
           </Col>
@@ -811,19 +823,56 @@ export default function Cashier() {
                     />
                   </>
                 ) : (
-                  <Select
-                    showSearch
-                    placeholder="Cari Pelanggan"
-                    optionFilterProp="children"
-                    style={{ minWidth: "100%", marginBottom: "10px" }}
-                    onChange={onChange}
-                    filterOption={(input, option) =>
-                      (option?.label ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    options={option}
-                  />
+                  <>
+                    <Select
+                      style={{
+                        width: "100%",
+                        marginBottom: "10px",
+                      }}
+                      defaultValue=""
+                      value={cari}
+                      onChange={(e) => setCari(e)}
+                    >
+                      <Option value="" disabled>
+                        Cari Berdasarkan
+                      </Option>
+                      <Option value="1">Nama Pelanggan</Option>
+                      <Option value="2">Nomor Telefon</Option>
+                    </Select>
+                    {cari ? (
+                      cari == "1" ? (
+                        <Select
+                          showSearch
+                          placeholder="Cari Nama Pelanggan"
+                          optionFilterProp="children"
+                          style={{ minWidth: "100%", marginBottom: "10px" }}
+                          onChange={onChange}
+                          filterOption={(input, option) =>
+                            (option?.label ?? "")
+                              .toLowerCase()
+                              .includes(input.toLowerCase())
+                          }
+                          options={option}
+                        />
+                      ) : (
+                        <Select
+                          showSearch
+                          placeholder="Cari Nomor Telefon"
+                          optionFilterProp="children"
+                          style={{ minWidth: "100%", marginBottom: "10px" }}
+                          onChange={onChange}
+                          filterOption={(input, option) =>
+                            (option?.label ?? "")
+                              .toLowerCase()
+                              .includes(input.toLowerCase())
+                          }
+                          options={noOption}
+                        />
+                      )
+                    ) : (
+                      ""
+                    )}
+                  </>
                 )
               ) : (
                 ""

@@ -33,7 +33,6 @@ export default function DetailPenjualan() {
       })
       .then((res) => {
         setDetail(res.data.data);
-        console.log(res.data.data);
       });
   };
 

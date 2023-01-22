@@ -33,7 +33,6 @@ export default function DetailPembelian() {
       })
       .then((res) => {
         setDetail(res.data.data);
-        console.log(res.data.data);
       });
   };
 

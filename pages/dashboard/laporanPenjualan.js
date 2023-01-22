@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Space, Table } from "antd";
+import { Button, DatePicker, Input, Space, Table } from "antd";
 import Highlighter from "react-highlight-words";
 import LayoutPage from "../../components/layoutPage";
 import axios from "axios";
@@ -9,6 +9,7 @@ import { Col, Container, Row } from "react-bootstrap";
 import { numberWithCommasString } from "../../components/utils/koma";
 import { authPage } from "../../middleware/authorizationPage";
 import Router from "next/router";
+import moment from "moment";
 
 export async function getServerSideProps(ctx) {
   const { token } = await authPage(ctx);
@@ -18,14 +19,44 @@ export async function getServerSideProps(ctx) {
 export default function LaporanPenjualan() {
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
+  const [total, setTotal] = useState(null);
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
+  let tahun = "";
+  let bulan = "";
+  let tanggal = "";
 
   useEffect(() => {
-    axios.get(api + "getPenjualan").then((res) => {
-      setData(res.data.data);
-    });
+    getPenjualan();
   }, []);
+
+  const getPenjualan = () => {
+    axios
+      .get(api + "getPenjualan", {
+        params: {
+          tahun: tahun,
+          bulan: bulan,
+          tanggal: tanggal,
+        },
+      })
+      .then((res) => {
+        setData(res.data.data);
+      });
+  };
+
+  const getTotal = () => {
+    axios
+      .get(api + "getTotalPenjualan", {
+        params: {
+          tahun: tahun,
+          bulan: bulan,
+          tanggal: tanggal,
+        },
+      })
+      .then((res) => {
+        setTotal(res.data.data[0].total);
+      });
+  };
 
   const handleClick = (record) => {
     Router.push("/dashboard/detailPenjualan/" + record.nomor_struk);
@@ -172,10 +203,15 @@ export default function LaporanPenjualan() {
     },
     {
       title: "Tanggal",
-      dataIndex: "insert_date",
       key: "insert_date",
       width: "10%",
-      ...getColumnSearchProps("insert_date"),
+      render: (data) => (
+        <>
+          <p style={{ marginBottom: "0px" }}>
+            {moment(data.insert_date).format("YYYY-MM-DD HH:mm:ss")}
+          </p>
+        </>
+      ),
     },
     {
       title: "Action",
@@ -196,6 +232,37 @@ export default function LaporanPenjualan() {
       ),
     },
   ];
+
+  const onTahunChange = (date, dateString) => {
+    tahun = dateString;
+    getPenjualan();
+    if (dateString) {
+      getTotal();
+    } else {
+      setTotal(null);
+    }
+  };
+
+  const onBulanChange = async (date, dateString) => {
+    bulan = dateString;
+    getPenjualan();
+    if (dateString) {
+      getTotal();
+    } else {
+      setTotal(null);
+    }
+  };
+
+  const onTanggalChange = (date, dateString) => {
+    tanggal = dateString;
+    getPenjualan();
+    if (dateString) {
+      getTotal();
+    } else {
+      setTotal(null);
+    }
+  };
+
   return (
     <>
       <Row>
@@ -219,6 +286,51 @@ export default function LaporanPenjualan() {
       </Row>
       <Container style={{ marginBottom: "80px" }}>
         <Row className="row-table">
+          <Row className="mb-2">
+            <p style={{ marginBottom: "5px", marginLeft: "5px" }}>
+              Filter Pertahun
+            </p>
+            <DatePicker
+              onChange={onTahunChange}
+              picker="year"
+              style={{
+                maxWidth: "400px",
+                marginBottom: "10px",
+                marginLeft: "1em",
+              }}
+            />
+            <p style={{ marginBottom: "5px", marginLeft: "5px" }}>
+              Filter Perbulan
+            </p>
+            <DatePicker
+              onChange={onBulanChange}
+              picker="month"
+              style={{
+                maxWidth: "400px",
+                marginBottom: "10px",
+                marginLeft: "1em",
+              }}
+            />
+            <p style={{ marginBottom: "5px", marginLeft: "5px" }}>
+              Filter Pertanggal
+            </p>
+            <DatePicker
+              onChange={onTanggalChange}
+              style={{
+                maxWidth: "400px",
+                marginBottom: "10px",
+                marginLeft: "1em",
+              }}
+            />
+          </Row>
+          {total != null && (
+            <Input
+              addonBefore="TOTAL HARGA"
+              style={{ marginBottom: "10px" }}
+              value={"Rp. " + numberWithCommasString(total)}
+              readOnly
+            />
+          )}
           <Table columns={columns} dataSource={data} />
         </Row>
       </Container>

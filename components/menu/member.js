@@ -22,7 +22,7 @@ export default function Member({ handleClick }) {
         navbarScroll
       >
         <Nav.Link onClick={() => handleClick("/dashboard/cashier")}>
-          Kasir
+          Penjualan
         </Nav.Link>
         <Nav.Link onClick={() => handleClick("/dashboard/laporanPenjualan")}>
           Laporan Penjualan
